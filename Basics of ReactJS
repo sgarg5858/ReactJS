@@ -1,0 +1,69 @@
+1. Understanding JSX:
+
+In the below code we are not using html it is JSX and it is compiled to React.createElement().This is javascript.
+
+class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        <h1>Hi, i want to be a react developer!</h1>
+      </div>
+    );
+    
+     return React.createElement('div',{className:'App'},
+     React.createElement('h1',null,' Hi, I am learning React'));
+  }
+}
+
+JSX Restrictions:
+
+We are not using the real html tags these are managed by react behind the scenes
+
+***************************************************************************************************************************************
+2. Creating a Functional Component:
+
+1. Functional components  
+
+const cmp = () => { return <div>some JSX</div> }
+
+2. class-based components 
+
+class Cmp extends Component 
+{ render () { return <div>some JSX</div> } }
+
+****************************************************************************************************************************
+3. Outputting Dynamic Content:
+
+We can use Single curly braces to execute one line functions in JSX!
+
+<p>I am a person and i am {Math.floor(Math.random() *30)} years old!</p>
+********************************************************************************
+In App.js
+
+ <Person name="Sanjay" age="21"></Person>
+ 
+ Getting Data From Parent in Child
+ 
+const person = (props) => {
+return <p>I am a {props.name} and i am {props.age} years old!</p>
+};
+
+**********************************************************************************
+How to handle Content passed in b/w the opening and closing
+
+children refers to any elements b/w the opening and closing tag of our element...
+
+<Person name="Sanjay" age="21">My Hobbies: Coding</Person>
+  
+  const person = (props) => {
+return (
+        <div>
+            <p>I am a {props.name} and i am {props.age} years old!</p>
+            <p>{props.children}</p>
+        </div>
+)
+};
+
+
+ 
+ 
