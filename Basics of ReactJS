@@ -34,10 +34,15 @@ class Cmp extends Component
 ****************************************************************************************************************************
 3. Outputting Dynamic Content:
 
+
 We can use Single curly braces to execute one line functions in JSX!
 
 <p>I am a person and i am {Math.floor(Math.random() *30)} years old!</p>
 ********************************************************************************
+Props:
+
+Props basically an object giving us access to all the attributes we pass to our components
+
 In App.js
 
  <Person name="Sanjay" age="21"></Person>
@@ -63,7 +68,97 @@ return (
         </div>
 )
 };
+************************************************************************************************************************************
+State:
+
+What if we have to output dynamic content based on the data inside the component instead of getting data from outside?
+
+state is only avaiable in class based react components..
+Props are set and passed from outside,state is managed from inside component...
+With new feature hooks in react we can also manage state in functional components...
+we should  use state in components with care as when app grows it becomes difficult to manage the state, prefer functional components
+as much as possible.
 
 
+ state={
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22},
+    ]
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <h1>Hi, i want to be a react developer!</h1>
+        <h2>That's Great Sanjay!</h2>
+        <Person name={this.state.persons[0].name} age={this.state.persons[0].age}>My Hobbies: Coding</Person>
+        <Person name={this.state.persons[1].name} age={this.state.persons[1].age}>My Hobbies: Coding</Person>
+        <Person name={this.state.persons[2].name} age={this.state.persons[2].age}>My Hobbies: Coding</Person>
+      </div>
+    );
+    
+State is a special property and it can be changed. When the state changes it will lead react to re-render our DOM or update the DOM..
+
+**************************************************************************************************************************************
+Props and State:
+
+1. props  and state  are CORE concepts of React. Actually, only changes in props  and/ or state  trigger React to re-render your components
+and potentially update the DOM in the browser.
+
+2. props  allow you to pass data from a parent (wrapping) component to a child (embedded) component.
+
+3. Whilst props allow you to pass data down the component tree (and hence trigger an UI update), state is used to change the component,
+well, state from within. Changes to state also trigger an UI update.
+
+**************************************************************************************************************************************
+Listening to Click Events:
+
+In App.js  We only pass the reference of function because if we add () then it will call this function when react render the component.
+
+ <button onClick={this.switchNameHandler}>Switch Name</button>
  
- 
+ switchNameHandler = () => {
+   console.log("Clicked")
+  };
+
+Different Events which we can listen
+
+https://www.udemy.com/course/react-the-complete-guide-incl-redux/learn/lecture/8124210#content
+
+************************************************************************************************************************************
+Changing State: 
+
+We don't change state directly... Below way is wrong...
+
+ switchNameHandler = () => {
+  //  console.log("Hanji Bro")
+  this.state.persons[1]="Rishabh";
+  };
+  
+  
+  state = {
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22},
+    ],
+    hobbies:"Coding"
+  };
+
+  switchNameHandler = () => {
+  // this setState method will only override the properties we are defining below 
+  // here it won't changes hobbies and will only override persons
+  this.setState({
+    persons:[
+      {name:"Sanjay Garg",age:21},
+      {name:"Prim Garg",age:23},
+      {name:"Sanyam Gupta",age:22},
+    ]
+  })
+  };
+  Reacts triggers updates DOM if there is change in state or props
+  
+  *********************************************************************************************************************************
+
