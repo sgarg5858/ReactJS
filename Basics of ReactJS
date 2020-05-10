@@ -160,5 +160,19 @@ We don't change state directly... Below way is wrong...
   };
   Reacts triggers updates DOM if there is change in state or props
   
-  *********************************************************************************************************************************
+*********************************************************************************************************************************
+Prior to version 16.8 class based components was the only way for managing state in components.
+Now since 16.8 there is also a way for us to manage state in functional components with React Hooks...
 
+Let's have a look at React Hooks:
+
+Hooks are basically a collection of functions exposed to you by react which you can use in functional components.
+
+useState() is react hook which basically allows us to manage state in functional component.
+useState() takes an argument initial state and always return array with 2 elements.
+First element is always the current state. the second element will be the function that will allow us to update this state,such that
+react is aware of it and will re-render the component.
+
+For Detail look at below file
+
+https://github.com/sgarg5858/ReactJS/blob/master/ReactHooks%20useState
