@@ -176,3 +176,83 @@ react is aware of it and will re-render the component.
 For Detail look at below file
 
 https://github.com/sgarg5858/ReactJS/blob/master/ReactHooks%20useState
+
+***********************************************************************************************************************************
+We learned that every component recieves props and we learned that since react 16.8 every component can manage state.
+
+Stateless and statefull Components:
+
+1. If a component is managing state no matter whether it is a class based component or functional component using state keyword or
+   react hooks then that is stateful components are also called smart(container components)..
+2. If not then Stateless components   
+
+***********************************************************************************************************************************
+Passing method References between Components:
+
+We can also pass method which are in parent component to child components using props.
+
+In Parent Component...
+
+ switchNameHandler = () => {
+    // console.log('Was clicked!');
+    // DON'T DO THIS: this.state.persons[0].name = 'Maximilian';
+    this.setState({
+      persons: [
+        { name: 'Maximilian', age: 28 },
+        { name: 'Manu', age: 29 },
+        { name: 'Stephanie', age: 27 }
+      ]
+    });
+  };
+  
+    <Person
+          name={this.state.persons[0].name}
+          age={this.state.persons[0].age}
+          click={this.switchNameHandler}
+     />
+     
+     In child Component
+     
+      <p onClick={props.click}>I am a {props.name} and i am {props.age} years old!</p>
+      
+*******************************************************************************************************************************      
+Suppose now we want to pass a value to this method?    
+
+Two ways of doing this =>
+
+ <button onClick={() => this.switchNameHandler('Sanjay')}>Switch Name</button>    a bit inefficient approach....
+ 
+ note here this before we only passed reference and here this is not getting executed immediately.Instead what we pass here is anonymous
+ function which will be executed on click
+ 
+   <Person
+          name={this.state.persons[0].name}
+          age={this.state.persons[0].age}
+          click={this.switchNameHandler.bind(this,'Sanjay Garg')}     />
+          
+*******************************************************************************************************************************
+Adding Two Way Binding:
+
+In App.js
+
+ nameChangedHandler = (event) => {
+    this.setState({
+    persons: [
+      { name: 'Max', age: 21 },
+      { name: event.target.value, age: 29 },
+      { name: 'Stephanie', age: 27 }
+    ]
+  })
+  };
+  
+    <Person
+          name={this.state.persons[1].name}
+          age={this.state.persons[1].age}
+          changed={this.nameChangedHandler}
+        >
+        
+    In Person.js
+    
+      <input type="text" value={props.name} onChange={props.changed}></input>
+
+   
