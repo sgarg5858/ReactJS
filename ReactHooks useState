@@ -1,0 +1,226 @@
+import React, { Component,useState } from 'react';
+import './App.css';
+import Person from './Person/Person';
+// class App extends Component {
+const App = (props) => {
+  
+ const [personsState, setPersonsState]= useState ({
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22},
+    ],
+    hobbies:"Coding"
+  });
+
+  const switchNameHandler = () => {
+   
+    setPersonsState({
+      persons:[
+        {name:"Sanjay Garg",age:21},
+        {name:"Prim Garg",age:23},
+        {name:"Sanyam Gupta",age:22},
+      ]
+    })
+    };
+
+    return (
+      <div className="App">
+        <h1>Hi, i want to be a react developer!</h1>
+        <h2>That's Great Sanjay!</h2>
+        <button onClick={switchNameHandler}>Switch Name</button>
+    <Person name={personsState.persons[0].name} age={personsState.persons[0].age}>{personsState.hobbies}</Person>
+        <Person name={personsState.persons[1].name} age={personsState.persons[1].age}></Person>
+        <Person name={personsState.persons[2].name} age={personsState.persons[2].age}></Person>
+      </div>
+    );
+    // return React.createElement('div',{className:'App'},
+    // React.createElement('h1',null,' Hi, I am learning React'));
+
+
+}
+
+export default App;
+*********************************************************************************************************************
+There is one difference b/w class based this.setState and setPersonsState in functional based components.
+
+this.setState merges the old state with the new one.
+
+But in react hooks it doesnot merge the old state with the new onw it only considers the new state or we can say it replaces the old
+state with the new state.Here we have to manually include all old state data...
+
+const [personsState, setPersonsState]= useState ({
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22}
+    ],
+    hobbies:"Coding"
+  });
+
+
+const switchNameHandler = () => {
+    setPersonsState({
+      persons:[
+        {name:"Sanjay Garg",age:21},
+        {name:"Prim Garg",age:23},
+        {name:"Sanyam Gupta",age:22},
+      ],
+      hobbies: personsState.hobbies
+    })
+    };
+    
+**************************************************************************************************************************
+Let's look at alternate ways to manaully merging old state...
+
+we can call useState in functional components multiple times instead we only call this.useState once in class based components...
+
+Multiple useStates with different state slices.....
+
+we can have one big state and manully merge them or we can have separated different state slices and we use useState multiple times
+and remember in class based this.useState() merges the old state and in functional based it is not merged so we do it manually
+or multiple use states....
+
+const [personsState, setPersonsState]= useState ({
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22},
+    ]
+  });
+
+const [hobbiesState, setHobbiesState]=useState({
+  hobbies:"Coding"
+})
+
+  console.log(personsState,hobbiesState);
+
+  const switchNameHandler = () => {
+    setPersonsState({
+      persons:[
+        {name:"Sanjay Garg",age:21},
+        {name:"Prim Garg",age:23},
+        {name:"Sanyam Gupta",age:22},
+      ] 
+    })
+    };
+    
+    
+*******************************************************************************************************************************
+Functional React Hook Based:
+
+import React, { Component,useState } from 'react';
+import './App.css';
+import Person from './Person/Person';
+// class App extends Component {
+const App = (props) => {
+  
+ const [personsState, setPersonsState]= useState ({
+    persons:[
+      {name:"Sanjay",age:21},
+      {name:"Prim",age:22},
+      {name:"Sanyam",age:22},
+    ]
+  });
+
+const [hobbiesState, setHobbiesState]=useState({
+  hobbies:"Coding"
+})
+
+  console.log(personsState,hobbiesState);
+
+  const switchNameHandler = () => {
+    setPersonsState({
+      persons:[
+        {name:"Sanjay Garg",age:21},
+        {name:"Prim Garg",age:23},
+        {name:"Sanyam Gupta",age:22},
+      ] 
+    })
+    };
+
+    return (
+      <div className="App">
+        <h1>Hi, i want to be a react developer!</h1>
+        <h2>That's Great Sanjay!</h2>
+        <button onClick={switchNameHandler}>Switch Name</button>
+    <Person name={personsState.persons[0].name} age={personsState.persons[0].age}>{personsState.hobbies}</Person>
+        <Person name={personsState.persons[1].name} age={personsState.persons[1].age}></Person>
+        <Person name={personsState.persons[2].name} age={personsState.persons[2].age}></Person>
+      </div>
+    );
+    // return React.createElement('div',{className:'App'},
+    // React.createElement('h1',null,' Hi, I am learning React'));
+}
+
+*********************************************************************************************************************************
+Class Based     
+
+import React, { Component } from 'react';
+import './App.css';
+import Person from './Person/Person';
+
+class App extends Component {
+  state = {
+    persons: [
+      { name: 'Max', age: 28 },
+      { name: 'Manu', age: 29 },
+      { name: 'Stephanie', age: 26 }
+    ],
+    otherState: 'some other value'
+  };
+
+  switchNameHandler = () => {
+    // console.log('Was clicked!');
+    // DON'T DO THIS: this.state.persons[0].name = 'Maximilian';
+    this.setState({
+      persons: [
+        { name: 'Maximilian', age: 28 },
+        { name: 'Manu', age: 29 },
+        { name: 'Stephanie', age: 27 }
+      ]
+    });
+  };
+
+  render() {
+    return (
+      <div className="App">
+        <h1>Hi, I'm a React App</h1>
+        <p>This is really working!</p>
+        <button onClick={this.switchNameHandler}>Switch Name</button>
+        <Person
+          name={this.state.persons[0].name}
+          age={this.state.persons[0].age}
+        />
+        <Person
+          name={this.state.persons[1].name}
+          age={this.state.persons[1].age}
+        >
+          My Hobbies: Racing
+        </Person>
+        <Person
+          name={this.state.persons[2].name}
+          age={this.state.persons[2].age}
+        />
+      </div>
+    );
+    // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
+  }
+}
+
+export default App;
+
+
+import React from 'react';
+
+const person = (props) => {
+return (
+        <div>
+            <p>I am a {props.name} and i am {props.age} years old!</p>
+            <p>{props.children}</p>
+        </div>
+)
+};
+
+
+export default person;
