@@ -127,6 +127,87 @@ Using Vanilla Javascript we are outputting a list by mapping an array into an ar
     })
   };
   
-  *****************************************************************************************************************************
+*****************************************************************************************************************************
+  IMP => List and Keys:
   
+  In short key should be
   
+  Unique - A key cannot be identical to that of a sibling component.
+  Static - A key should not ever change between renders.
+
+  
+  https://stackoverflow.com/questions/28329382/understanding-unique-keys-for-array-children-in-react-js
+  
+  The key property is an important property while rendering the list of data..Its a default property react expects to find on
+  element no matter custom or html element when you are rendering list.
+  This key property helps react update the list efficiently.
+  
+  React has something virtual DOM where it compares what it would render now if it were to call render method now.
+  React basically compares the elements of Future with the past....
+  
+  if(this.state.showPersons)
+    {
+      persons=(
+        <div>
+          {this.state.persons.map( (person,index) => {
+            return <Person 
+            click={() => this.deletePersonHandler(index)} 
+            name={person.name} 
+            age={person.age} 
+            key={person.id}                            check here
+            />
+          })}
+      </div> 
+      )
+    }
+*****************************************************************************************************************************
+Flexible Lists:
+
+ nameChangedHandler = (event,id) => {
+    const personIndex=this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
+    //arrays and objects are of reference types
+    const person = {
+      ...this.state.persons[personIndex]};
+
+    person.name=event.target.value;
+
+    const persons= [...this.state.persons];
+    persons[personIndex]=person;
+
+    this.setState({
+    persons: persons
+  })
+  };
+  
+    if(this.state.showPersons)
+    {
+      persons=(
+        <div>
+          {this.state.persons.map( (person,index) => {
+            return <Person 
+            click={() => this.deletePersonHandler(index)} 
+            name={person.name} 
+            age={person.age} 
+            key={person.id}
+            changed={(event) => this.nameChangedHandler(event, person.id)}
+            />
+          })}
+      </div> 
+      )
+    }
+    
+    const person = (props) => {
+return (
+    <div style={{textAlign:"center"}} >
+        <Card style={{ width: '50rem',height:'9rem',textAlign:'center',marginBottom:'3px' }}>
+            <Card.Body style={{textAlign:'center'}}>
+                    <p onClick={props.click}>I am a {props.name} and i am {props.age} years old!</p>
+                    <p>{props.children}</p>
+                    <input type="text" value={props.name} onChange={props.changed}></input>
+            </Card.Body>
+        </Card>
+    </div>    
+)
+};
