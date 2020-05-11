@@ -1,0 +1,121 @@
+1. We want to psuedo classes for our button we can't use psuedo classes in Components and if we define in .css then it will be for global
+then what should we do?
+
+class App extends Component {
+  state = {
+    persons: [
+      { id:1, name: 'Sanjay', age: 22 },
+      { id:2,name: 'Prim', age: 23 },
+      { id:3,name: 'Sanyam', age: 23 }
+    ],
+    otherState: 'some other value',
+    showPersons : true
+  };
+  
+  render() {
+    const style = {
+      backgroundColor: 'green',
+      color :'white',
+      font: 'inherit',
+      border: '1px ',
+      padding: '8px',
+      cursor: 'pointer'
+    };
+
+    let persons =null;
+
+    if(this.state.showPersons)
+    {
+      persons=(
+        <div>
+          {this.state.persons.map( (person,index) => {
+            return <Person 
+            click={() => this.deletePersonHandler(index)} 
+            name={person.name} 
+            age={person.age} 
+            key={person.id}
+            changed={(event) => this.nameChangedHandler(event, person.id)}
+            />
+          })}
+      </div> 
+      )
+      style.backgroundColor='red';
+    }
+
+    return (
+      <div className="App">
+        <h1>Hi, I'm a React App</h1>
+        <p>This is really working!</p>
+        <button style={style}
+          onClick={this.togglePersonsHandler}>
+           {this.state.showPersons === true ? 'Hide Persons' : 'Show Persons' }</button>
+           {persons}
+      </div>
+    );
+  }
+}
+
+export default App;
+
+********************************************************************************************************************************
+
+Changing classes in JSX Dynamically
+
+render() {
+    const style = {
+      backgroundColor: 'green',
+      color :'white',
+      font: 'inherit',
+      border: '1px ',
+      padding: '8px',
+      cursor: 'pointer'
+    };
+
+    let persons =null;
+
+    if(this.state.showPersons)
+    {
+      persons=(
+        <div>
+          {this.state.persons.map( (person,index) => {
+            return <Person 
+            click={() => this.deletePersonHandler(index)} 
+            name={person.name} 
+            age={person.age} 
+            key={person.id}
+            changed={(event) => this.nameChangedHandler(event, person.id)}
+            />
+          })}
+      </div> 
+      )
+      style.backgroundColor='red';
+    }
+
+    const classes=[];
+    if(this.state.persons.length<=2)
+    {
+      classes.push('red');
+    }
+    if(this.state.persons.length<=1)
+    {
+      classes.push('bold');
+    }
+
+    return (
+      <div className="App">
+        <h1>Hi, I'm a React App</h1>
+        
+        <p className={classes.join(' ')} >This is really working!</p>
+        
+        <button style={style}
+          onClick={this.togglePersonsHandler}>
+           {this.state.showPersons === true ? 'Hide Persons' : 'Show Persons' }</button>
+           {persons}
+      </div>
+    );
+  }
+}
+************************************************************************************************************************************
+Using Radium for using psudeo classes in components without this it is not possible to use psuedo classes
+
+Radium is used when we want to change classes and styles dynamically or we want to use these things only in a component...
