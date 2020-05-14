@@ -1,0 +1,64 @@
+Add this in index.js for global access
+
+import axios from 'axios';
+
+//default Configuartion
+
+axios.defaults.baseURL='https://jsonplaceholder.typicode.com';
+axios.defaults.headers.common['Authorization'] = 'AUTH TOKEN';
+axios.defaults.headers.post['Content-Type']='application/json';
+
+//for sending requests globally
+axios.interceptors.request.use( (request) => {
+    console.log(request);
+     return request;
+},error =>{
+    console.log(error);
+    return Promise.reject(error);
+});
+
+//for recieving requests globally
+axios.interceptors.response.use( (response) => {
+    console.log(response);
+     return response;
+},error =>{
+    console.log(error);
+    return Promise.reject(error);
+});
+
+
+****************************************************************************************************************
+Creating Different instances of axios in case we want to use different headers or baseURL for different parts of application
+
+https://www.udemy.com/course/react-the-complete-guide-incl-redux/learn/lecture/8125794#content
+
+Create new file 
+
+import axios from 'axios';
+
+const instance = axios.create({
+    baseURL:'https://jsonplaceholder.typicode.com'
+});
+
+instance.defaults.headers.common['Authorization'] = 'AUTH TOKEN FROM INSTANCE';
+
+instance.interceptors.request.use( (request) => {
+    console.log(request);
+     return request;
+},error =>{
+    console.log(error);
+    return Promise.reject(error);
+});
+
+//for recieving requests globally
+instance.interceptors.response.use( (response) => {
+    console.log(response);
+     return response;
+},error =>{
+    console.log(error);
+    return Promise.reject(error);
+});
+
+export default instance;
+
+import axios from this file to use this instance not from 'axios' to use particular instance;
