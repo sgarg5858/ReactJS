@@ -1,0 +1,45 @@
+import React ,{Component} from 'react';
+
+//importComponent should be function reference in the end.
+//At some point component will be loaded which will be stored in our state
+const asyncComponent = (importComponent) =>{
+
+    return class extends Component {
+
+        state={
+            component:null
+        }
+
+        componentDidMount()
+        {
+            importComponent()
+                .then( (cmp) => {
+                    this.setState({ component: cmp.default})
+                });
+        }
+
+        render()
+        {
+            const C=this.state.component;
+            return C? <C {...this.props}/> : null;
+        }
+    }
+};
+
+export default asyncComponent;
+
+
+Now in Blog.js
+
+Instead of adding NewPost to main Bundle this will be downloaded when we render AysncNewPost on screen as asyncComponent returns 
+component.
+
+import asyncComponent from '../../hoc/asyncComponent';
+
+// this arrow function will only be executed if we render AsyncComponent to screen.
+const AysncNewPost = asyncComponent( () => {
+    //dynamic support syntax  
+    return import('../NewPost/NewPost');
+    });
+    
+     { this.state.auth ? <Route path="/new-post" exact  component={AysncNewPost} />: null }
