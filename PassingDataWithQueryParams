@@ -1,0 +1,27 @@
+
+
+const queryParams=[];
+for(let ingredient in this.state.ingredients)
+{
+    queryParams.push(encodeURIComponent(ingredient)+ '=' +encodeURIComponent(this.state.ingredients[ingredient]));
+}
+const querySting =queryParams.join('&');
+this.props.history.push({
+    pathname: '/checkout',
+    search: '?'+querySting
+});
+
+
+
+  componentDidMount()
+    {
+        const query= new URLSearchParams(this.props.location.search);
+        const ingredients={};
+        for(let param of query.entries())
+        {
+            ingredients[param[0]]= +param[1];
+        }  
+        this.setState({
+            ingredients:ingredients
+        }) ;
+    }
