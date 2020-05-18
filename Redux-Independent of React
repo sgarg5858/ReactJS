@@ -1,0 +1,44 @@
+const redux=require('redux');
+const createStore =redux.createStore;
+const initialState={
+    counter:0
+}
+
+//Reducer takes 2 argumnets first old state and second action and return new state.
+// If state is undefined it will initial state as state and it will be when it executes reducer for first time.
+const rootReducer = (state=initialState, action) =>{
+    switch(action.type)
+    {
+        case 'INC_COUNTER':
+            return {
+                ...state,
+                counter:state.counter + 1
+            };
+            break;
+        case 'ADD_COUNTER':
+            return {
+                ...state,
+                counter:state.counter + action.value
+            };
+            break;
+        default:
+            return state;    
+    }
+    return state;
+};
+
+//Store takes reducer as an argument
+const store=createStore(rootReducer);
+console.log(store.getState());
+
+//Subscription  it is getting triggered whenever state is updated...
+store.subscribe(() => {
+    console.log('[Subscription]',store.getState())
+});
+
+//Dispatching Action
+store.dispatch({type:'INC_COUNTER'});
+store.dispatch({type:'ADD_COUNTER', value:10 });
+console.log(store.getState());
+
+Run Using node filename.js
