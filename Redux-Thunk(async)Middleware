@@ -1,0 +1,19 @@
+export const saveResult =(result) =>{
+    return {
+        type: ActionTypes.STORE,
+        result:result
+    }
+}
+
+export const store = ({result}) => {
+    return  (dispatch,getState) =>
+    {
+        setTimeout(()=>{
+            const oldCounter=getState().ctr.counter;
+            console.log(oldCounter);
+            dispatch(saveResult(result))
+        },2000);
+    }
+}
+
+const store=createStore(rootReducer,composeEnhancers(applyMiddleware(logger,thunk)));
