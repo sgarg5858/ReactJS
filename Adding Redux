@@ -1,0 +1,167 @@
+
+
+****************************************************************************************************************************
+Reducers
+
+import * as Actions from '../actions';
+
+const initialState={
+    results:[]
+};
+
+const result = (state=initialState,action) =>{
+
+    switch(action.type){
+
+        case(Actions.STORE):
+        return{
+            ...state,
+            results:state.results.concat({id:new Date(),value:action.result})//via payload
+            //push will change the original state array
+        };
+        break;
+
+        case(Actions.DELETE):
+        const newArray=state.results.filter((result) => result.id!==action.id);
+        return{
+            ...state,
+            results:newArray
+        };
+        break;
+    }
+      return state;
+   
+};
+
+export default result;
+
+********************************************************************
+import * as Actions from '../actions';
+
+const initialState={
+    counter:0,
+};
+
+const counter = (state=initialState,action) =>{
+
+    switch(action.type){
+
+        case(Actions.INCREMENT):
+            return{
+                ...state,
+                counter:state.counter+1
+            };
+            break;
+
+        case(Actions.DECREMENT):
+        return{
+            ...state,
+            counter:state.counter-1
+        };
+        break;
+
+        case(Actions.ADD):
+        return{
+            ...state,
+            counter:state.counter+action.value
+        };
+        break;
+
+        case(Actions.SUBTRACT):
+        return{
+            ...state,
+            counter:state.counter-action.value
+        };
+        break;
+    }
+    return state;
+};
+
+export default counter;
+
+**********************************************************************************************
+1. In Index.js
+
+
+import {createStore,combineReducers} from 'redux';
+import {Provider} from 'react-redux';
+
+
+import counterReducer  from './store/reducers/counter';
+import resultReducer  from './store/reducers/result';
+
+const rootReducer=combineReducers({
+    ctr: counterReducer,
+    res: resultReducer
+});
+//this takes reducer as argument.
+const store=createStore(rootReducer);
+
+ReactDOM.render( <Provider store={store}> <App /> </Provider>  , document.getElementById('root'));
+
+******************************************************************************************************************
+Action.js  Good Practice
+
+export const INCREMENT= 'INCREMENT';
+export const DECREMENT= 'DECREMENT';
+export const ADD= 'ADD';
+export const SUBTRACT= 'SUBTRACT';
+export const STORE= 'STORE';
+export const DELETE= 'DELETE';
+
+******************************************************************************************************************
+Dispatching actions from component.
+
+import React, { Component } from 'react';
+import {connect} from 'react-redux';//hoc 
+import * as Actions from '../../store/actions';
+import CounterControl from '../../components/CounterControl/CounterControl';
+import CounterOutput from '../../components/CounterOutput/CounterOutput';
+
+class Counter extends Component {
+  
+    render () {
+        return (
+            <div>
+                <CounterOutput value={this.props.ctr} />
+                <CounterControl label="Increment" clicked={this.props.onIncrementCounter} />
+                <CounterControl label="Decrement" clicked={this.props.onDecrementCounter}  />
+                <CounterControl label="Add 5" clicked={this.props.onAddCounter}  />
+                <CounterControl label="Subtract 5" clicked={this.props.onSubtractCounter}  />
+                <hr></hr>
+                <button onClick={() => this.props.onStoreResult(this.props.ctr)}>Store Result</button>
+                <ul>
+                    {this.props.storedResults.map( (result) =>{
+                        return ( <li 
+                            key={result.id}
+                            onClick={() => this.props.onRemoveResult(result.id)}
+                            >{result.value}</li>)
+                    })}
+                   
+                </ul>
+            </div>
+        );
+    }
+}
+
+const mapStateToProps= state =>{
+    return {
+        ctr : state.ctr.counter,
+        storedResults: state.res.results
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    return{
+        onIncrementCounter: () => dispatch({type:Actions.INCREMENT}),
+        onDecrementCounter: () => dispatch({type:Actions.DECREMENT}),
+        onAddCounter:() => dispatch({type:Actions.ADD,value:5}),
+        onSubtractCounter: () => dispatch({type:Actions.SUBTRACT,value:5}),
+        onStoreResult: (result) => dispatch({type: Actions.STORE,result:result}),
+        onRemoveResult: (id) => dispatch({type:Actions.DELETE,id:id})
+
+    };
+};
+
+//connect is a function that returns higher order component.
+export default connect(mapStateToProps,mapDispatchToProps)(Counter);
