@@ -1,0 +1,86 @@
+Imp Points:
+
+1. REACT.MEMO =>
+
+We are using React.memo on Child Component so that Child Component does not get rendered for every re-render in parent.
+It basically memoizes the state and returns it will only re-render if there is some change in PROPS.
+
+2. useCallback() =>
+
+As we know functions in functional Component(which is function) for every render gets created again thus new instance.So to cache it
+we are using useCallback() in parent so that survives render cycles.As for every render we will get new instanceof this function
+which can cause infinite loop in search component.
+
+3. useRef() => 
+
+Basically what we are doing is we  don't want to send request for keystrock on search engine if user stops for a while after typing
+then we want to send a request and for that we want to match the prev value and the current value. Due to how closures work in Js
+we will only get past value not current value for that we are using useRef() hook
+
+
+***********************************************************************************************************************************
+In Ingredient.js(Parent)
+
+const filteredIngredientsHandler = useCallback((filteredIngredients) =>{
+  setUserIngredients(filteredIngredients);
+},[]);  
+
+<Search onUpdateIngredients={filteredIngredientsHandler}/>
+
+***********************************************************************************************************************************
+
+
+In Search.js (Child)
+
+const Search = React.memo(props => {
+
+   const {onUpdateIngredients}=props;
+   const [enteredFilter, setEnteredFilter] = useState('');
+   const inputRef= useRef();
+
+useEffect(()=>{
+
+ const timer= setTimeout(()=>{
+
+    if(enteredFilter===inputRef.current.value )
+    {
+      const queryParams= enteredFilter.length===0 ? '': `?orderBy="title"&equalTo="${enteredFilter}"`;
+      axios.get('https://angular-backend-1ae77.firebaseio.com/ingredients.json'+queryParams).then(
+        (response)=>{
+          const loadedIngredients=[];
+          for(const key in response.data)
+          { 
+            loadedIngredients.push({
+              id:key,
+              title:response.data[key].title,
+              amount:response.data[key].amount
+            });
+          }
+            onUpdateIngredients(loadedIngredients);
+        });
+    }
+  },500);
+  //this clean up function will run before next run not after this ends
+  return ()=>{
+    clearTimeout(timer);
+  };
+},[enteredFilter,onUpdateIngredients,inputRef])
+
+  return (
+    <section className="search">
+      <Card>
+        <div className="search-input">
+          <label>Filter by Title</label>
+          <input 
+          ref={inputRef}
+          type="text" 
+          value={enteredFilter} 
+          onChange={(event)=> setEnteredFilter(event.target.value)} 
+          />
+        </div>
+      </Card>
+    </section>
+  );
+});
+
+export default Search;
