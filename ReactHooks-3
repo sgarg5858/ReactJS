@@ -1,0 +1,90 @@
+import React,{useState,useEffect,useCallback, useReducer} from 'react';
+import axios from 'axios';
+import IngredientForm from './IngredientForm';
+import IngredientList from './IngredientList';
+import Search from './Search';
+import ErrorModal from '../UI/ErrorModal';
+
+const httpReducer= (httpState,action) =>{
+  switch(action.type)
+  {
+    case 'SEND':
+      return{...httpState, loading:true,error:null };
+    case 'RESPOND':
+      return{...httpState,loading:false};
+    case 'ERROR':
+      return{...httpState, loading:true,error:action.errorData };
+      case 'CLEAR':
+        return{...httpState, loading:false,error:null };
+    default:
+      throw new Error('Should not be reached');
+  }
+}
+
+const Ingredients = () => {
+
+  const [userIngrdients,setUserIngredients]=useState([]);
+  // const [isLoading,setLoadingState] = useState(false);
+  // const [error,setError] = useState(null);
+  const [httpState,dispatchHttpState]=useReducer(httpReducer,{loading:false,error:null});
+
+useEffect(()=>{
+  console.log('Rendering Ingredients',userIngrdients)
+});
+
+
+const filteredIngredientsHandler = useCallback((filteredIngredients) =>{
+  setUserIngredients(filteredIngredients);
+},[]);  
+
+
+const removeIngredientHandler = ingredientId => {
+  dispatchHttpState({type:'SEND'});
+  axios.delete(`https://angular-backend-1ae77.firebaseio.com/ingredients/${ingredientId}.json`).
+  then((response)=>{
+    dispatchHttpState({type:'RESPOND'});
+    setUserIngredients(prevIngredients =>( prevIngredients.filter(ingredient => ingredient.id !==ingredientId)
+    ))
+  })
+ 
+}
+
+const addIngredientHandler= (ingredient) =>{
+  dispatchHttpState({type:'SEND'});
+axios.post('https://angular-backend-1ae77.firebaseio.com/ingredients.jon',ingredient).
+then((response) =>{
+  dispatchHttpState({type:'RESPOND'});
+  setUserIngredients(prevIngredients =>{
+    return [
+      ...prevIngredients,
+      {id:response.data.name,  ...ingredient }
+     ]
+  });
+}).catch(error=>{
+  dispatchHttpState({type:'ERROR',errorData:'Something Went Wrong'});
+  
+})
+  
+};
+
+const clearError = () =>{
+  dispatchHttpState({type:'CLEAR'});
+}
+
+  return (
+    <div className="App">
+
+      {httpState.error?<ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>:null}
+      <IngredientForm  onAddIngredient={addIngredientHandler} loading={httpState.loading}/>
+
+      <section>
+        <Search 
+         onUpdateIngredients={filteredIngredientsHandler}
+        />
+        <IngredientList ingredients={userIngrdients} onRemoveItem={(id) =>{removeIngredientHandler(id)}}/>
+      </section>
+    </div>
+  );
+}
+
+export default Ingredients;
