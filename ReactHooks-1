@@ -1,0 +1,27 @@
+1. useState()
+
+useState is core hook.
+
+const[counter,setCounter]=useState(0);
+
+useState always returns two values first is state of component and second is function for updating the state, and we can use multiple
+useState as when we update by default in functional components new State is replaced by old state so instead of manually merging
+old state we can define modular useStates.
+
+Imp:
+We declare a state variable called count, and set it to 0. 
+React will remember its current value between re-renders, and provide the most recent one to our function.
+If we want to update the current count, we can call setCount.
+
+****************************************************************************************************************************
+2. useEffect() is used for side Effects like http requests..
+
+useEffect( ()=>{ executeSomething(),return()=>{}},[])
+
+return anonymous function executes before next useEffect Rerun this is basically for cleanUp work
+and [] is for specifying dependencies
+if not second argument is not specified then it will run for every render.
+if empty array then only when component mounts
+we can specify dependencies if dependencies changes then it will run
+
+****************************************************************************************************************************
