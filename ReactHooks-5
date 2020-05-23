@@ -1,0 +1,11 @@
+useMemo()+callBack() hook is an alternate to React.memo() + useCallback() for optimizations if there is some heavy comples caculation
+in component which you don't wanna do on every re-render then we can use useMemo();
+ 
+ const ingredientList = useMemo(() => {
+    return (
+      <IngredientList
+        ingredients={userIngredients}
+        onRemoveItem={removeIngredientHandler}
+      />
+    );
+  }, [userIngredients, removeIngredientHandler]);
