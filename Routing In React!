@@ -1,0 +1,41 @@
+1. Router(Browser Router) should cover the part of application which is using Routing
+
+2. Switch allows only one route to match otherwise mutiple components can be loaded.
+
+3. Route is used to specify path and its component
+
+4. exact is used for exact match otherwise only prefix match is used...
+
+
+import React,{Fragment} from 'react';
+import {BrowserRouter as Router,Route,Switch} from 'react-router-dom';
+import './App.css';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+const App = () => {
+  return (
+    <Router>
+      <Fragment>
+      <Navbar/>
+      <Route exact path="/" component={Landing}/>
+      <section className="container">
+        <Switch>
+        <Route exact path="/register" component={Register}/>
+        <Route exact path="/login" component={Login}/>
+        </Switch>
+      </section>
+    </Fragment>
+    </Router>
+    
+  );
+}
+
+export default App;
+
+5. Navbar used Link... for SPA loading otherwise it will reload the page....
+
+<Link to="/register">Register</Link>
+
+
