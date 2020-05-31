@@ -1,0 +1,65 @@
+1. Setting up Store and Passing Root Reducer and then connecting Redux to React using Provider from reacr-redux;
+
+Installing ReduxDevToolsExtension using npm makes it easy to use.
+
+store.js
+
+import {createStore,applyMiddleware} from 'redux';
+import {composeWithDevTools} from 'redux-devtools-extension';
+import thunk from 'redux-thunk';
+import rootReducer from './reducers';
+
+const initialState={};
+
+const middleware=[thunk];
+
+const store=createStore(
+    rootReducer,
+    initialState,
+    composeWithDevTools(applyMiddleware(...middleware))
+    );
+
+export default store;
+
+******************************************************************************************************************************
+create reducer folder and index.js file in their which will export all the reducers and combine them...to root Reducer
+
+import {combineReducers} from 'redux';
+
+
+export default combineReducers({});
+******************************************************************************************************************************
+Now Connecting React and Redux.... In App.js Using Provider and passing store to it..
+
+import React,{Fragment} from 'react';
+import {BrowserRouter as Router,Route,Switch} from 'react-router-dom';
+import './App.css';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+//Redux Provider connects react and redux... as we know redux is different package
+import { Provider } from 'react-redux';
+import store  from './store'; 
+const App = () => {
+  return (
+    <Provider store={store}>
+      <Router>
+        <Fragment>
+          <Navbar/>
+          <Route exact path="/" component={Landing}/>
+          <section className="container">
+            <Switch>
+            <Route exact path="/register" component={Register}/>
+            <Route exact path="/login" component={Login}/>
+            </Switch>
+          </section>
+        </Fragment>
+      </Router>
+    </Provider>
+    
+    
+  );
+}
+
+export default App;
