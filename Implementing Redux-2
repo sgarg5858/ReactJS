@@ -45,7 +45,88 @@ export const setAlert = (msg,alertType) => dispatch => {
     })
 }
 
-
+Now we have action which is going to dispatch
 Alert Component which will call this action....
 ***************************************************************************************************************************
+Now where we do we need dispatch SetAlert 
+1. When Passwords do not match.
 
+So Therefore for now we have to connect this Register Component to Redux... and we do this via connect from react-redux...
+
+import {connect} from 'react-redux';
+import {setAlert} from '../../actions/alert';
+
+//This will dispatch the action and then action goes to reducer and reducer to store.
+
+const onSubmit =(event)=>{
+        //as bydefault this is submit...
+        event.preventDefault();
+        if(password !==password2)
+        {
+            console.log("Passwords do not match..");
+            props.setAlert('Passwords do not match','danger');
+        }
+        else{
+        console.log(formData);
+        }
+    }
+
+export default connect(null,{setAlert})(Register);
+
+**************************************************************************************************************************
+Now we will create Alert Component show that user can see as above will only change the state it won't reflect in UI
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+
+const Alert = (props) => {
+
+    let alertMessages=null;
+
+    if(props.alerts != null && props.alerts.length > 0)
+    {
+      alertMessages=  props.alerts.map((alert)=>{
+           return( <div key={alert.id} className={`alert alert-${alert.alertType}`}>
+                {alert.msg}
+            </div>);
+        })
+    }
+
+    return (
+        <div>
+            {alertMessages}
+        </div>
+    )
+}
+
+Alert.propTypes = {
+    alerts:PropTypes.array.isRequired
+}
+
+const mapStateToProps = state => ({
+    alerts: state.alert
+})
+
+export default connect(mapStateToProps)(Alert);
+
+***************************************************************************************************************************
+Now we have to use this Alert Component in App.js for it to render...
+
+App.js
+
+   <Provider store={store}>
+      <Router>
+        <Fragment>
+          <Navbar/>
+          <Route exact path="/" component={Landing}/>
+          <section className="container">
+            <Alert/>
+            <Switch>
+            <Route exact path="/register" component={Register}/>
+            <Route exact path="/login" component={Login}/>
+            </Switch>
+          </section>
+        </Fragment>
+      </Router>
+    </Provider>
