@@ -98,3 +98,126 @@ export default connect(null,{setAlert,register})(Register);
             props.register({name,email,password});
         }
     }
+********************************************************************************************************************************
+Now we will use other functionality when app start we should check for local storage in APP.js
+
+For that we will create 2 types 
+
+export const USER_LOADED= 'USER_LOADED';
+export const AUTH_ERROR= 'AUTH_ERROR';
+
+Now Actions for this
+
+//LOAD_USER
+export const loadUser = () => async dispatch =>{
+    if(localStorage.token)
+    {
+        setAuthToken(localStorage.token);
+    }
+    try{
+        const res=await axios.get('http://localhost:5000/api/auth');
+        dispatch({
+            type:USER_LOADED,
+            payload:res.data
+        });
+    }catch(error)
+    {
+        dispatch({
+            type:AUTH_ERROR
+        });
+    }
+} 
+****************************************************************************
+Reducer Auth
+
+import{REGISTER_SUCCESS,REGISTER_FAIL,USER_LOADED,AUTH_ERROR} from '../actions/types';
+
+const initialState={
+    token:localStorage.getItem('token'),
+    isAuthenticated:null,
+    loading:true,
+    user:null
+};
+
+export default function(state=initialState,action){
+
+    const{type,payload}=action;
+    switch(type)
+    {
+        case USER_LOADED: 
+            return{
+                ...state,
+                isAuthenticated:true,
+                loading:false,
+                user:payload
+            };
+
+        case REGISTER_SUCCESS:
+            localStorage.setItem('token',payload.token);
+            return{
+                ...state,
+                ...payload,
+                isAuthenticated:true,
+                loading:false
+            };
+            
+        case AUTH_ERROR: 
+        case REGISTER_FAIL:
+            localStorage.removeItem('token');
+            return{
+                ...state,
+                token:null,
+                isAuthenticated:false,
+                loading:false
+            };
+        
+        default:
+            return state;
+
+    }
+}
+**********************************************************************************************
+Create New Folder Utils
+and new function in there to set headers and remove headers
+
+import axios from 'axios';
+
+const setAuthToken= (token) => {
+
+    if(token)
+    {
+        axios.defaults.headers.common['x-auth-token']= token;
+    }else{
+        delete axios.defaults.headers.common['x-auth-token'];
+    }
+}
+
+export default setAuthToken;
+
+*****************************************************************************************************
+Now we have to call this function when app starts and also execute load user once when App.js Starts.
+
+App.js
+
+import React,{Fragment,useEffect} from 'react';
+import {BrowserRouter as Router,Route,Switch} from 'react-router-dom';
+import {loadUser} from  './actions/auth';
+import setAuthToken from './utils/setAuthToken';
+
+if(localStorage.token)
+{
+    console.log("In App.js");
+    setAuthToken(localStorage.token);
+}
+const App = () => {
+
+  useEffect(()=>{
+    store.dispatch(loadUser())
+  },[]);
+
+  return ();
+}
+
+export default App;
+
+***************************************************************************************************************************
