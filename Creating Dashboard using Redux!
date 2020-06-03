@@ -1,0 +1,30 @@
+Now Dashboard ia private Route Component should only be visible to users who are logged in...
+
+We will Create a new component for this PrivateRoute
+
+import React,{Component} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux';
+import {Route,Redirect} from 'react-router-dom';
+const PrivateRoute = ({component:Component, auth, ...rest }) => {
+    return (
+       <Route {...rest} render={props => !auth.isAuthenticated && !auth.loading ? 
+        (<Redirect to='/login' />) : (<Component {...props} />)}/>
+    )
+}
+
+PrivateRoute.propTypes = {
+    auth:PropTypes.object.isRequired
+}
+const mapStateToProps = state => ({
+    auth:state.auth
+})
+
+export default connect(mapStateToProps)(PrivateRoute)
+
+ <PrivateRoute exact path="/dashboard" component={Dashboard}/>
+ 
+ ************************************************************************************************************************************
+ Now as soon as the User Logs in User Profile should be fetched.
+ 
+ Now we will create Profile Reducer,Action and Component.
