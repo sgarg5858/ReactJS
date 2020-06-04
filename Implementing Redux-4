@@ -29,4 +29,104 @@ export default connect(mapStateToProps)(PrivateRoute)
  
  Now we will create Profile Reducer,Action and Component.
  
+ First Types for Actions...
+ 
+export const GET_PROFILE="GET_PROFILE";
+export const PROFILE_ERROR="PROFILE_ERROR";
+
+Profile Reducer 
+
+import { GET_PROFILE, PROFILE_ERROR } from "../actions/types";
+
+const initialState={
+    profile:null,
+    profiles:[],
+    repos:[],
+    loading:true,
+    error:{}
+}
+
+export default function(state=initialState,action)
+{
+    const {type, payload}= action;
+
+    switch(type)
+    {
+        case GET_PROFILE:
+            return{
+                ...state,
+                profile:payload,
+                loading:false
+            };
+            
+        case PROFILE_ERROR:
+            return{
+                ...state,
+                error:payload,
+                loading:false
+            }    
+        default:
+            return state;
+    }
+}
+
+********************************************************************************************************************************
+Profile Action:.....
+
+import axios from 'axios';
+import {setAlert} from './alert';
+import {GET_PROFILE,PROFILE_ERROR} from './types';
+
+export const getCurrentProfile = () => async dispatch =>{
+    try {
+        //No need to pass id as it will get it from token..
+        const res = await axios.get('http://localhost:5000/api/profile/me');
+        dispatch({
+            type:GET_PROFILE,
+            payload:res.data
+        });
+    } catch (error) {
+        dispatch({
+            type:PROFILE_ERROR,
+            payload:{msg:error.response.statusText,status:error.response.status}
+        });
+    }
+}
+
+************************************************************************************************************************
+Now we need to dispatch this action as soon as user goes to dashboard component....
+
+import React,{useEffect} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux';
+import {getCurrentProfile} from '../../actions/profile';
+const Dashboard = (props) => {
+
+    useEffect(()=>{
+        props.getCurrentProfile();
+    },[])
+
+    return (
+        <div>
+            Dashboard
+        </div>
+    )
+}
+
+Dashboard.propTypes = {
+    getCurrentProfile:PropTypes.func.isRequired,
+    auth:PropTypes.object.isRequired,
+    profile:PropTypes.object.isRequired,
+}
+const mapStateToProps = state =>({
+    auth:state.auth,
+    profile:state.profile
+})
+export default connect(mapStateToProps,{getCurrentProfile})(Dashboard)
+************************************************************************************************************************************
+
+
+
+
+ 
  
