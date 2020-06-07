@@ -1,0 +1,469 @@
+First we will focus on getting All Posts from backend so for that reducer and actions and action types
+
+import {GET_POSTS,POST_ERROR} from '../actions/types';
+
+const initialState={
+    posts:[],
+    post:null,
+    loading:true,
+    error:null
+};
+
+export default function(state=initialState,action)
+{
+    const{type,payload}=action;
+    switch(type)
+    {
+        case GET_POSTS:
+            return{
+                ...state,
+                posts:payload,
+                loading:false
+            };
+        case GET_POSTS:
+            return{
+                ...state,
+                error:payload,
+                loading:false
+            };
+        default:
+            return state;
+    }
+}
+
+**************************************************************************************************************
+const getPosts = () => async dispatch => {
+
+    try {
+        const res = await axios.get('http://localhost:5000/api/posts');
+        dispatch({
+            type:GET_POSTS,
+            payload:res.data
+        });
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+************************************************************************************************************************
+Now Component: which will call this action in useEffect to fetch all posts...
+
+import React,{useEffect,Fragment} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
+import {getPosts} from '../../actions/post';
+import Spinner from '../layout/Spinner';
+import PostItem from './PostItem';
+
+const Posts = ({getPosts,post:{posts,loading}}) => {
+
+    useEffect(()=>{
+        getPosts();
+    },[getPosts])
+
+    return loading? <Spinner/>:<Fragment>
+        <h1 className="large text-primary">Posts</h1>
+        <p className="lead">
+            <i className="fas fa-user"></i>Welcome to Community
+        </p>
+        {/* PostFormComponent */}
+        <div className="posts">
+            {posts.map((post)=>{
+                return <PostItem key={post._id} post={post} />
+            })}
+        </div>
+    </Fragment>
+}
+
+Posts.propTypes = {
+    getPosts:PropTypes.func.isRequired,
+    post:PropTypes.object.isRequired
+}
+
+const mapStateToProps = state =>({
+    post:state.post
+})
+
+export default connect(mapStateToProps,{getPosts})(Posts)
+
+******************************************************************************************************************************
+Post Item Component:
+
+Here we are going to have lot of functionality add like remove like same for comments...
+
+
+import React,{Fragment} from 'react'
+import PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+import Moment from 'react-moment'
+import {connect} from 'react-redux'
+
+const PostItem = ({post:{_id,text,name,avatar,likes,user,comments,date},auth}) => {
+    return (
+        <div className="post bg-white p-1 my-1">
+          <div>
+            <a href="profile.html">
+              <img
+                className="round-img"
+                src={avatar}
+                alt=""
+              />
+              <h4>{name}</h4>
+            </a>
+          </div>
+          <div>
+            <p className="my-1">
+              {text}
+            </p>
+             <p className="post-date">
+                Posted on <Moment format='YYYY/MM/DD'>{date}</Moment>
+            </p>
+            <button type="button" class="btn btn-light">
+              <i className="fas fa-thumbs-up"></i>{' '}
+              {likes.length > 0 ?<span>{likes.length}</span>:null}
+            </button>
+            <button type="button" className="btn btn-light">
+              <i className="fas fa-thumbs-down"></i>
+            </button>
+            <Link to={`/post/${_id}`} className="btn btn-primary">
+              Discussion {comments.length > 0 ?<span className='comment-count'>{comments.length}</span>:null}
+            </Link>
+            {!auth.loading && user === auth.user._id? 
+             <button      
+             type="button"
+             className="btn btn-danger">
+             <i className="fas fa-times"></i>
+           </button> : null
+            }
+           
+          </div>
+        </div>
+
+    )
+}
+
+PostItem.propTypes = {
+    post:PropTypes.object.isRequired,
+    auth:PropTypes.object.isRequired
+}
+
+const mapStateToProps= state =>({
+    auth:state.auth
+})
+
+export default connect(mapStateToProps,{})(PostItem)
+
+************************************************************************************************************************
+Now it only shows posts no functionality is there but now we will add like and unlike ...
+
+export const UPDATE_LIKES='UPDATE_LIKES';
+
+Actions:
+
+//add Like
+export const addLike = (postId) => async dispatch => {
+
+    try {
+        const res = await axios.get(`http://localhost:5000/api/posts/like/${postId}`);
+        dispatch({
+            type:UPDATE_LIKES,
+            payload:{id:postId,likes:res.data}
+        });
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+//add Like
+export const removeLike = (postId) => async dispatch => {
+
+    try {
+        const res = await axios.get(`http://localhost:5000/api/posts/unlike/${postId}`);
+        dispatch({
+            type:UPDATE_LIKES,
+            payload:{id:postId,likes:res.data}
+        });
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+
+Reducer
+
+ case UPDATE_LIKES:
+            return{
+                ...state,
+                posts: state.posts.map((post)=>{
+                   return post._id===payload.id ? {...post,likes:payload.likes}:post
+                }),
+                loading:false
+            }
+            
+  dispatch this actions component
+******************************************************************************************************************************* 
+  Deleting Post
+  
+  
+//Delete Post
+export const deletePost = (postId) => async dispatch => {
+
+    try {
+        const res = await axios.delete(`http://localhost:5000/api/posts/${postId}`);
+        dispatch({
+            type:DELETE_POST,
+            payload:{id:postId}
+        });
+        setAlert('Post Deleted','success');
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+
+
+Reducer
+  
+  case DELETE_POST:
+            return{
+                ...state,
+                posts: state.posts.filter((post)=>{
+                    return post._id !== payload.id 
+                }),
+                loading:false
+            }
+ ******************************************************************************************************************************
+ Adding Post
+ 
+ export const addPost = (formData) => async dispatch => {
+
+    try {
+        const config={
+            headers:{
+                'Content-Type':'application/json'
+            }
+        };
+        const res = await axios.post('http://localhost:5000/api/posts',formData,config);
+        dispatch({
+            type:ADD_POST,
+            payload:res.data
+        });
+        dispatch(setAlert('Post Created','success'));
+
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+
+ case ADD_POST:
+            return{
+                ...state,
+                posts:[payload,...state.posts],
+                loading:false
+            }
+            
+  import React,{useState} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
+import {addPost} from '../../actions/post';
+const PostForm = ({addPost}) => {
+
+    const[text,setText]=useState('');
+
+    return (
+        <div className="post-form">
+        <div className="bg-primary p">
+          <h3>Say Something...</h3>
+        </div>
+        <form className="form my-1" onSubmit={(event)=>{
+            event.preventDefault();
+            addPost({text});
+            setText('');
+        }}>
+          <textarea
+            name="text"
+            cols="30"
+            rows="5"
+            placeholder="Create a post"
+            value={text}
+            onChange={event => setText(event.target.value)}
+            required
+          ></textarea>
+          <input type="submit" className="btn btn-dark my-1" value="Submit" />
+        </form>
+      </div>
+    )
+}
+
+PostForm.propTypes = {
+addPost:PropTypes.func.isRequired
+}
+
+export default connect(null,{addPost})(PostForm)
+
+import React,{useEffect,Fragment} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
+import {getPosts} from '../../actions/post';
+import Spinner from '../layout/Spinner';
+import PostItem from './PostItem';
+import PostForm from './PostForm';
+const Posts = ({getPosts,post:{posts,loading}}) => {
+
+    useEffect(()=>{
+        getPosts();
+    },[getPosts])
+
+    return loading? <Spinner/>:<Fragment>
+        <h1 className="large text-primary">Posts</h1>
+        <p className="lead">
+            <i className="fas fa-user"></i>Welcome to Community
+        </p>
+        <PostForm/>
+        <div className="posts">
+            {posts.map((post)=>{
+                return <PostItem key={post._id} post={post} />
+            })}
+        </div>
+    </Fragment>
+}
+
+Posts.propTypes = {
+    getPosts:PropTypes.func.isRequired,
+    post:PropTypes.object.isRequired
+}
+
+const mapStateToProps = state =>({
+    post:state.post
+})
+
+export default connect(mapStateToProps,{getPosts})(Posts)
+*********************************************************************************************************************************
+Single Individual Post:
+
+export const getPost = (postId) => async dispatch => {
+
+    try {
+        const res = await axios.get(`http://localhost:5000/api/posts/${postId}`);
+        dispatch({
+            type:GET_POST,
+            payload:res.data
+        });
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+ case GET_POST:
+            return{
+                ...state,
+                post:payload,
+                loading:false
+            };
+            
+import React,{Fragment,useEffect} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
+import Spinner from '../layout/Spinner';
+import {getPost} from '../../actions/post';
+import PostItem from '../posts/PostItem';
+import {Link} from 'react-router-dom'
+const Post = ({getPost,post:{post,loading},match}) => {
+    useEffect(()=>{
+        getPost(match.params.postId);
+    },[getPost])
+    return loading || post ===  null ? <Spinner/> : <Fragment>
+        <Link to="/posts" className="btn">Back to Posts</Link>
+        <PostItem post={post} showActions={false} />
+    </Fragment>
+}
+
+Post.propTypes = {
+    getPost:PropTypes.func.isRequired,
+    post:PropTypes.object.isRequired
+}
+
+const mapStateToProps=state =>({
+    post:state.post
+})
+
+export default connect(mapStateToProps,{getPost})(Post)
+
+**********************************************************************************************************************
+Working on Comments:
+
+export const addComment = (postId,formData) => async dispatch => {
+
+    try {
+        const config={
+            headers:{
+                'Content-Type':'application/json'
+            }
+        };
+        const res = await axios.post(`http://localhost:5000/api/posts/comment/${postId}`,formData,config);
+        dispatch({
+            type:ADD_COMMENT,
+            payload:res.data
+        });
+        dispatch(setAlert('Comment Added','success'));
+
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+export const deleteComment = (postId,commentId) => async dispatch => {
+
+    try {
+    
+        await axios.delete(`http://localhost:5000/api/posts/comment/${postId}/${commentId}`);
+        dispatch({
+            type:DELETE_COMMENT,
+            payload:{postId,commentId}
+        });
+        dispatch(setAlert('Comment Removed','success'));
+
+    } catch (error) {
+        dispatch({
+            type:POST_ERROR,
+            payload:{msg:error.response,status:error.response}
+        });
+    }
+}
+
+Reducers....
+
+case ADD_COMMENT:
+            return{
+                ...state,
+                post:{...state.post,comments:payload},
+                loading:false
+            }
+        case DELETE_COMMENT:
+            return{
+                ...state,
+                post:{...state.post,comments:state.post.comments.filter((comment)=>{
+                    return comment._id != payload.commentId
+                }),
+                loading:false
+                }
+            }
+            
+     
+ 
+ 
